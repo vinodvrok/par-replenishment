@@ -1,7 +1,7 @@
 services:
   - type: web
-    name: par-replenishment
+    name: parreplenishment-service
     env: java
-    buildCommand: mvn clean package
-    startCommand: java -jar target/*.jar
     plan: free
+    startCommand: java -jar parreplenishment-0.0.1-SNAPSHOT.jar
+    autoDeploy: true
