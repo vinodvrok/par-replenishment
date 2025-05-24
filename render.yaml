@@ -3,5 +3,6 @@ services:
     name: parreplenishment-service
     env: java
     plan: free
-    startCommand: java -jar parreplenishment-0.0.1-SNAPSHOT.jar
+    buildCommand: ""
+    startCommand: java -jar render-deploy/parreplenishment-0.0.1-SNAPSHOT.jar
     autoDeploy: true
