@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: par-replenishment
+    env: java
+    buildCommand: |
+      export JAVA_HOME=/opt/render/project/.jdk
+      chmod +x mvnw
+      ./mvnw clean package
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: JAVA_HOME
+        value: /opt/render/project/.jdk
+      - key: JAVA_VERSION
+        value: 17
