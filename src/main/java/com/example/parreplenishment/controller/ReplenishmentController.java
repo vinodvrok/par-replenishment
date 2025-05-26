@@ -18,16 +18,12 @@ public class ReplenishmentController {
     @Autowired
     private ReplenishmentService service;
 
-    @PostMapping(value = "/getReplenishmentsforPARLocator", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public List<Item> getItems(@RequestParam("file") MultipartFile file) throws Exception {
-        StringBuilder sb = new StringBuilder();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-        }
-        String locator = service.identifyLocator(sb.toString());
-        return service.getItemsForLocator(locator);
+    @PostMapping(value = "/getReplenishmentsforPARLocator", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public List<Item> getItems(@RequestBody Map<String, Object> request) throws Exception {
+        String locatorText = (String) request.get("locatorText");
+        String itemName = (String) request.get("item"); // Can be null
+        String locator = service.identifyLocator(locatorText);  // Optional if already clean
+        return service.getItemsForLocator(locator,itemName);
     }
 
     @PostMapping("/getOnHandForItems")
