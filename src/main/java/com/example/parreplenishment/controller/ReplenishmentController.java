@@ -33,11 +33,23 @@ public class ReplenishmentController {
         return service.getOnHand(items);
     }
 
-    @PostMapping("/createReplenishment")
+  /*  @PostMapping("/createReplenishment")
     public Map<String, Object> createReplenishment(@RequestBody Map<String, Object> request) {
         String item = (String) request.get("item");
         int qty = (Integer) request.get("replenishmentQty");
         return service.createReplenishment(item, qty);
+    }*/
+    
+    @PostMapping("/createOrder")
+    public Map<String, Object> createOrder(@RequestBody Map<String, Object> request) {
+        String item = (String) request.get("item");
+        int qty = (Integer) request.get("replenishmentQty");
+        return service.createOrder(item, qty);
+    }
+    
+    @GetMapping("/getScheduledSurgeries")
+    public Map<String, Object> getScheduledSurgeries() {
+        return service.getScheduledSurgeries();
     }
 }
 
