@@ -4,9 +4,7 @@
 	import org.springframework.stereotype.Service;
 	import java.time.YearMonth;
 	import java.time.format.TextStyle;
-	import java.util.Locale;
-	
-	import java.util.*;
+import java.util.*;
 	import java.util.stream.Collectors;
 	
 	@Service
@@ -16,12 +14,12 @@
 	    private final Map<String, Item> items = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 	
 	    public ReplenishmentService() {
-	        items.put("Suture Kit - Ethicon", new Item("Suture Kit - Ethicon", 50, subinventory));
-	        items.put("Disposable Surgical Gloves - Size 7.5", new Item("Disposable Surgical Gloves - Size 7.5", 100,subinventory));
-	        items.put("Sterile gloves", new Item("Sterile gloves", 120,subinventory));
-	        items.put("IV Cannulas", new Item("IV Cannulas", 200,subinventory));
-	        items.put("Surgical clamps", new Item("Surgical clamps", 70,subinventory));
-	        items.put("Disposable syringe with needle 50cc", new Item("Disposable syringe with needle 50cc", 150,subinventory));
+	        items.put("Suture Kit - Ethicon", new Item("Suture Kit - Ethicon", 700, subinventory));
+	        items.put("Disposable Surgical Gloves - Size 7.5", new Item("Disposable Surgical Gloves - Size 7.5", 375,subinventory));
+	        items.put("Sterile gloves", new Item("Sterile gloves", 1000,subinventory));
+	        items.put("IV Cannulas", new Item("IV Cannulas", 800,subinventory));
+	        items.put("Surgical clamps", new Item("Surgical clamps", 200,subinventory));
+	        items.put("Disposable syringe with needle 50cc", new Item("Disposable syringe with needle 50cc", 500,subinventory));
 	    }
 	
 	    public String identifyLocator(String content) {
@@ -84,11 +82,11 @@
 
 	        // Mock data for surgeries — most common surgeries globally
 	        List<Map<String, Object>> surgeries = new ArrayList<>();
-	        surgeries.add(Map.of("surgery", "Cataract Surgery", "count", 45));
-	        surgeries.add(Map.of("surgery", "Cesarean Section", "count", 15));
-	        surgeries.add(Map.of("surgery", "Appendectomy", "count", 7));
-	        surgeries.add(Map.of("surgery", "Gallbladder Removal (Cholecystectomy)", "count", 20));
-	        surgeries.add(Map.of("surgery", "Angioplasty", "count", 80));
+	        surgeries.add(Map.of("surgery", "Cataract Surgery", "count", 41));
+	        surgeries.add(Map.of("surgery", "Cesarean Section", "count", 14));
+	        surgeries.add(Map.of("surgery", "Appendectomy", "count", 9));
+	        surgeries.add(Map.of("surgery", "Gallbladder Removal (Cholecystectomy)", "count", 18));
+	        surgeries.add(Map.of("surgery", "Angioplasty", "count", 72));
 
 	        response.put("scheduledSurgeries", surgeries);
 
@@ -133,5 +131,53 @@
 
 	        return response;
 	    }
+	    
+	    
+	    public Map<String, Integer> getTotalCountNeededForItems(List<String> requestedItems) {
+	        // Mock mapping: item → qty needed per surgery
+	        Map<String, Integer> itemPerSurgeryQty = Map.of(
+	            "Suture Kit - Ethicon", 4,
+	            "Disposable Surgical Gloves - Size 7.5", 2,
+	            "Sterile gloves", 6,
+	            "IV Cannulas", 5,
+	            "Surgical clamps", 1,
+	            "Disposable syringe with needle 50cc", 3
+	        );
+
+	        // Get scheduled surgeries (reuse your existing method)
+	        Map<String, Object> scheduledSurgeries = getScheduledSurgeries();
+
+	        @SuppressWarnings("unchecked")
+	        List<Map<String, Object>> surgeries = (List<Map<String, Object>>) scheduledSurgeries.get("scheduledSurgeries");
+
+	        // Use case-insensitive map for output
+	        Map<String, Integer> totalNeeded = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
+	        // Filter items only to those requested and present in itemPerSurgeryQty
+	        Set<String> filterSet = requestedItems == null ? Collections.emptySet() :
+	                requestedItems.stream()
+	                    .map(String::toLowerCase)
+	                    .collect(Collectors.toSet());
+
+	        for (String itemName : itemPerSurgeryQty.keySet()) {
+	            if (filterSet.isEmpty() || filterSet.contains(itemName.toLowerCase())) {
+	                totalNeeded.put(itemName, 0);
+	            }
+	        }
+
+	        // Calculate total quantity needed only for filtered items
+	        for (Map<String, Object> surgery : surgeries) {
+	            int surgeryCount = (Integer) surgery.get("count");
+
+	            for (String itemName : totalNeeded.keySet()) {
+	                int qtyPerSurgery = itemPerSurgeryQty.get(itemName);
+	                int currentTotal = totalNeeded.getOrDefault(itemName, 0);
+	                totalNeeded.put(itemName, currentTotal + surgeryCount * qtyPerSurgery);
+	            }
+	        }
+
+	        return totalNeeded;
+	    }
+
 
 	}
