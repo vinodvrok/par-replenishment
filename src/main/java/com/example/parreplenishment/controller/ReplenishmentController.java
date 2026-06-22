@@ -3,12 +3,16 @@ package com.example.parreplenishment.controller;
 import com.example.parreplenishment.model.Item;
 import com.example.parreplenishment.service.ReplenishmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @RestController
@@ -51,5 +55,13 @@ public class ReplenishmentController {
     public Map<String, Object> getScheduledSurgeries() {
         return service.getScheduledSurgeries();
     }
+    
+    @GetMapping(value = "/mock", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> mockRecommendations() throws Exception {
+        ClassPathResource resource = new ClassPathResource("mock/sourcing-recommendation-response.json");
+        String json = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
+        return ResponseEntity.ok(json);
+    }
+    
 }
 
