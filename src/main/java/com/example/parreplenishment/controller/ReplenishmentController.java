@@ -56,6 +56,7 @@ public class ReplenishmentController {
         return service.getScheduledSurgeries();
     }
     
+    //Added this for mock
     @GetMapping(value = "/mock", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> mockRecommendations() throws Exception {
         ClassPathResource resource = new ClassPathResource("mock/sourcing-recommendation-response.json");
